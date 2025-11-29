@@ -1,0 +1,56 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+tidy-rename
+tidy-rename.exe
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Output directories (user-generated)
+output/
+cleaned/
+ue5_audio/
+TEST/
+TEST_WORK/
+
+# Manifest files (user-generated)
+manifest.json
+
+# Sample audio files (keep the directory structure but ignore actual files)
+SAMPLES/*.wav
+SAMPLES/*.mp3
+SAMPLES/*.ogg
+SAMPLES/*.flac
+SAMPLES/*.aac
+SAMPLES/*.m4a
+SAMPLES/*.wma
+
+# Release archives
+*.zip
+*.tar.gz
+*.tar
+
