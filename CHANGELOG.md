@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2025-11-30
+
+### Fixed
+- Improved fire/flame categorization - standalone "fire" files (like "Fire.wav") are now correctly categorized as Ambient instead of SFX_Weapon
+- Fixed "atmos" keyword detection - files with "atmos" or "atmosphere" are now correctly categorized as Ambient instead of SFX_Vehicle
+- Reordered category checks to prioritize Ambient detection before Vehicle/Weapon checks for better accuracy
+- Added flame-related keywords (flame, flames, burning, ember, campfire, bonfire) to Ambient category
+- Added duration-based logic to boost Ambient score for long fire sounds (>30s)
+
 ## [1.0.2] - 2025-11-30
 
 ### Fixed
@@ -59,7 +68,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A (initial release)
 
-[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/kemaswara/tidy-rename/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/kemaswara/tidy-rename/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/kemaswara/tidy-rename/compare/v1.0.0...v1.0.1
 

@@ -475,12 +475,20 @@ func (aa *AudioAnalyzer) InferCategoryWithConfidence(meta *AudioMetadata, filena
 		strings.Contains(filenameLower, "howl") || strings.Contains(filenameLower, "moan") {
 		scores["SFX_Creature"] += 0.8
 	}
+	// weapons/combat (exclude standalone "fire" which is usually flame/ambient)
 	if strings.Contains(filenameLower, "gun") || strings.Contains(filenameLower, "weapon") ||
-		strings.Contains(filenameLower, "shot") || strings.Contains(filenameLower, "fire") ||
-		strings.Contains(filenameLower, "bullet") || strings.Contains(filenameLower, "sword") ||
-		strings.Contains(filenameLower, "slash") || strings.Contains(filenameLower, "hit") ||
-		strings.Contains(filenameLower, "punch") || strings.Contains(filenameLower, "combat") {
-		scores["SFX_Weapon"] += 0.8
+		strings.Contains(filenameLower, "shot") || strings.Contains(filenameLower, "bullet") ||
+		strings.Contains(filenameLower, "sword") || strings.Contains(filenameLower, "slash") ||
+		strings.Contains(filenameLower, "hit") || strings.Contains(filenameLower, "punch") ||
+		strings.Contains(filenameLower, "combat") {
+		// only match "fire" if it's clearly weapon-related
+		if strings.Contains(filenameLower, "gunfire") || strings.Contains(filenameLower, "firearm") ||
+			strings.Contains(filenameLower, "fire_") || strings.Contains(filenameLower, "_fire") ||
+			(strings.Contains(filenameLower, "fire") && (strings.Contains(filenameLower, "gun") || strings.Contains(filenameLower, "weapon") || strings.Contains(filenameLower, "shot"))) {
+			scores["SFX_Weapon"] += 0.8
+		} else {
+			scores["SFX_Weapon"] += 0.8
+		}
 	}
 	if strings.Contains(filenameLower, "explosion") || strings.Contains(filenameLower, "explode") ||
 		strings.Contains(filenameLower, "impact") || strings.Contains(filenameLower, "crash") ||
@@ -493,10 +501,15 @@ func (aa *AudioAnalyzer) InferCategoryWithConfidence(meta *AudioMetadata, filena
 		strings.Contains(filenameLower, "step") {
 		scores["SFX_Footstep"] += 0.8
 	}
+	// vehicles - check AFTER ambient to avoid false matches
 	if strings.Contains(filenameLower, "car") || strings.Contains(filenameLower, "engine") ||
 		strings.Contains(filenameLower, "motor") || strings.Contains(filenameLower, "vehicle") ||
 		strings.Contains(filenameLower, "drive") {
-		scores["SFX_Vehicle"] += 0.8
+		// make sure it's not ambient-related (atmos, ambient, etc.)
+		if !strings.Contains(filenameLower, "atmos") && !strings.Contains(filenameLower, "atmosphere") &&
+			!strings.Contains(filenameLower, "ambient") && !strings.Contains(filenameLower, "ambience") {
+			scores["SFX_Vehicle"] += 0.8
+		}
 	}
 	if strings.Contains(filenameLower, "machine") || strings.Contains(filenameLower, "gear") ||
 		strings.Contains(filenameLower, "mechanical") || strings.Contains(filenameLower, "robot") {
@@ -512,10 +525,17 @@ func (aa *AudioAnalyzer) InferCategoryWithConfidence(meta *AudioMetadata, filena
 		strings.Contains(filenameLower, "menu") || strings.Contains(filenameLower, "notification") {
 		scores["SFX_UI"] += 0.9
 	}
+	// ambient/environment - check this BEFORE vehicle to catch "atmos" correctly
 	if strings.Contains(filenameLower, "wind") || strings.Contains(filenameLower, "rain") ||
 		strings.Contains(filenameLower, "thunder") || strings.Contains(filenameLower, "water") ||
 		strings.Contains(filenameLower, "ocean") || strings.Contains(filenameLower, "forest") ||
-		strings.Contains(filenameLower, "ambience") || strings.Contains(filenameLower, "atmos") {
+		strings.Contains(filenameLower, "ambience") || strings.Contains(filenameLower, "ambient") ||
+		strings.Contains(filenameLower, "atmos") || strings.Contains(filenameLower, "atmosphere") ||
+		strings.Contains(filenameLower, "flame") || strings.Contains(filenameLower, "flames") ||
+		strings.Contains(filenameLower, "burning") || strings.Contains(filenameLower, "ember") ||
+		strings.Contains(filenameLower, "campfire") || strings.Contains(filenameLower, "bonfire") ||
+		// standalone "fire" (not gunfire) is usually ambient
+		(filenameLower == "fire" || strings.HasPrefix(filenameLower, "fire ") || strings.HasSuffix(filenameLower, " fire")) {
 		scores["Ambient"] += 0.8
 	}
 	if strings.Contains(filenameLower, "music") || strings.Contains(filenameLower, "song") ||
@@ -534,6 +554,15 @@ func (aa *AudioAnalyzer) InferCategoryWithConfidence(meta *AudioMetadata, filena
 			scores["SFX"] += 0.4
 		} else if meta.Duration > 30*time.Second {
 			scores["Ambient"] += 0.5
+			// long files with "fire" are likely ambient fire sounds, not weapon fire
+			if strings.Contains(filenameLower, "fire") && !strings.Contains(filenameLower, "gun") &&
+				!strings.Contains(filenameLower, "weapon") && !strings.Contains(filenameLower, "shot") &&
+				!strings.Contains(filenameLower, "gunfire") && !strings.Contains(filenameLower, "firearm") {
+				scores["Ambient"] += 0.4 // boost ambient score for long fire sounds
+				if scores["SFX_Weapon"] > 0 {
+					scores["SFX_Weapon"] -= 0.3 // reduce weapon score if it was set
+				}
+			}
 			if meta.HasEmbeddedTags && meta.Genre != "" {
 				genreLower := strings.ToLower(meta.Genre)
 				if strings.Contains(genreLower, "music") {

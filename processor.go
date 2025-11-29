@@ -305,13 +305,24 @@ func (ap *AudioProcessor) inferCategory(name string) string {
 		return "SFX_Creature"
 	}
 
-	// weapons/combat
+	// weapons/combat (exclude standalone "fire" which is usually flame/ambient)
+	// only match "fire" if it's clearly weapon-related (gunfire, firearm, etc.)
 	if strings.Contains(nameLower, "gun") || strings.Contains(nameLower, "weapon") ||
-		strings.Contains(nameLower, "shot") || strings.Contains(nameLower, "fire") ||
-		strings.Contains(nameLower, "bullet") || strings.Contains(nameLower, "sword") ||
-		strings.Contains(nameLower, "slash") || strings.Contains(nameLower, "hit") ||
-		strings.Contains(nameLower, "punch") || strings.Contains(nameLower, "combat") {
+		strings.Contains(nameLower, "shot") || strings.Contains(nameLower, "bullet") ||
+		strings.Contains(nameLower, "sword") || strings.Contains(nameLower, "slash") ||
+		strings.Contains(nameLower, "hit") || strings.Contains(nameLower, "punch") ||
+		strings.Contains(nameLower, "combat") ||
+		strings.Contains(nameLower, "gunfire") || strings.Contains(nameLower, "firearm") {
 		return "SFX_Weapon"
+	}
+	// match "fire" only if it's combined with weapon keywords
+	if strings.Contains(nameLower, "fire") {
+		if strings.Contains(nameLower, "gun") || strings.Contains(nameLower, "weapon") ||
+			strings.Contains(nameLower, "shot") || strings.Contains(nameLower, "gunfire") ||
+			strings.Contains(nameLower, "firearm") {
+			return "SFX_Weapon"
+		}
+		// standalone "fire" will be caught by ambient check below
 	}
 
 	// impacts/explosions
@@ -327,6 +338,21 @@ func (ap *AudioProcessor) inferCategory(name string) string {
 		strings.Contains(nameLower, "walk") || strings.Contains(nameLower, "run") ||
 		strings.Contains(nameLower, "jump") || strings.Contains(nameLower, "land") {
 		return "SFX_Footstep"
+	}
+
+	// nature/environment (including fire/flame as ambient) - check this BEFORE vehicle to catch "atmos"
+	if strings.Contains(nameLower, "wind") || strings.Contains(nameLower, "rain") ||
+		strings.Contains(nameLower, "thunder") || strings.Contains(nameLower, "storm") ||
+		strings.Contains(nameLower, "water") || strings.Contains(nameLower, "ocean") ||
+		strings.Contains(nameLower, "forest") || strings.Contains(nameLower, "nature") ||
+		strings.Contains(nameLower, "atmos") || strings.Contains(nameLower, "atmosphere") ||
+		strings.Contains(nameLower, "ambient") || strings.Contains(nameLower, "ambience") ||
+		strings.Contains(nameLower, "flame") || strings.Contains(nameLower, "flames") ||
+		strings.Contains(nameLower, "burning") || strings.Contains(nameLower, "ember") ||
+		strings.Contains(nameLower, "campfire") || strings.Contains(nameLower, "bonfire") ||
+		// standalone "fire" (not gunfire) is usually ambient
+		(nameLower == "fire" || strings.HasPrefix(nameLower, "fire ") || strings.HasSuffix(nameLower, " fire")) {
+		return "Ambient"
 	}
 
 	// vehicles
@@ -350,14 +376,6 @@ func (ap *AudioProcessor) inferCategory(name string) string {
 		strings.Contains(nameLower, "siren") || strings.Contains(nameLower, "warning") ||
 		strings.Contains(nameLower, "beep") || strings.Contains(nameLower, "buzz") {
 		return "SFX_Alarm"
-	}
-
-	// nature/environment
-	if strings.Contains(nameLower, "wind") || strings.Contains(nameLower, "rain") ||
-		strings.Contains(nameLower, "thunder") || strings.Contains(nameLower, "storm") ||
-		strings.Contains(nameLower, "water") || strings.Contains(nameLower, "ocean") ||
-		strings.Contains(nameLower, "forest") || strings.Contains(nameLower, "nature") {
-		return "Ambient"
 	}
 
 	// mechanical
