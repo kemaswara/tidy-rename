@@ -35,14 +35,15 @@ jobs:
       - name: Build
         run: go build -o ${{ matrix.output }} -v
 
-      - name: Create archive
+      - name: Create archive (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: Compress-Archive -Path ${{ matrix.output }} -DestinationPath ${{ matrix.archive }} -Force
+
+      - name: Create archive (Linux/macOS)
+        if: matrix.os != 'windows-latest'
         shell: bash
-        run: |
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            zip ${{ matrix.archive }} ${{ matrix.output }}
-          else
-            tar -czf ${{ matrix.archive }} ${{ matrix.output }}
-          fi
+        run: tar -czf ${{ matrix.archive }} ${{ matrix.output }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

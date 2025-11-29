@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-11-30
+
+### Fixed
+- Fixed Windows archive creation in GitHub Actions workflow - now uses PowerShell's `Compress-Archive` instead of missing `zip` command
+
 ## [1.0.0] - 2025-11-30
 
 ### Added
@@ -48,6 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A (initial release)
 
-[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/kemaswara/tidy-rename/releases/tag/v1.0.0
+[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/kemaswara/tidy-rename/compare/v1.0.0...v1.0.1
 
