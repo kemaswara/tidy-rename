@@ -66,10 +66,17 @@ jobs:
         with:
           path: ./artifacts
 
+      - name: Flatten artifact structure
+        run: |
+          mkdir -p ./release-assets
+          find ./artifacts -type f \( -name "*.zip" -o -name "*.tar.gz" \) -exec cp {} ./release-assets/ \;
+          ls -lh ./release-assets/
+
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/*
+          tag_name: ${{ github.ref_name }}
+          files: ./release-assets/*
           draft: false
           prerelease: false
         env:

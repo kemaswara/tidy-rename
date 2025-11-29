@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2025-11-30
+
+### Fixed
+- Fixed GitHub Actions release workflow to properly attach all platform binaries (Windows, Linux, macOS) to releases
+- Added artifact flattening step to ensure all build artifacts are included in releases
+
 ## [1.0.1] - 2025-11-30
 
 ### Fixed
@@ -53,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A (initial release)
 
-[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/kemaswara/tidy-rename/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/kemaswara/tidy-rename/compare/v1.0.0...v1.0.1
 
