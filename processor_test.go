@@ -12,7 +12,7 @@ func TestCleanName(t *testing.T) {
 		expected string
 	}{
 		{"hello-world", "Hello_World"},
-		{"test_file.wav", "Test_Filewav"}, // cleanName doesn't preserve dots
+		{"test_file.wav", "Test_Filewav"},           // cleanName doesn't preserve dots
 		{"PE-Horror_BW.28968", "Pe_Horror_Bw28968"}, // dots removed
 		{"scream_male_123", "Scream_Male_123"},
 		{"test___multiple___underscores", "Test_Multiple_Underscores"},
@@ -62,8 +62,6 @@ func TestCleanNamePart(t *testing.T) {
 }
 
 func TestInferCategory(t *testing.T) {
-	ap := NewAudioProcessor(Config{PackName: "TestPack"})
-
 	tests := []struct {
 		input    string
 		expected string
@@ -80,51 +78,57 @@ func TestInferCategory(t *testing.T) {
 		{"door_creak", "SFX_Object"},
 		{"button_click", "SFX_UI"},
 		{"wind_ambient", "Ambient"},
-		{"music_track", "SFX"}, // music keyword not in inferCategory, only in InferCategoryWithConfidence
+		{"music_track", "Music"}, // music and track keywords now supported
 		{"siren_alarm", "SFX_Alarm"},
 		{"random_sound", "SFX"}, // default fallback
 		{"", "SFX"},
+		{"drone_sustained", "SFX_Drone"},
+		{"loop_music", "Music"},
+		{"riser_tension", "SFX_Riser"},
+		{"whoosh_wind", "SFX_Whoosh"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			result := ap.inferCategory(tt.input)
+			result := InferCategory(tt.input)
 			if result != tt.expected {
-				t.Errorf("inferCategory(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("InferCategory(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
 }
 
 func TestNormalizeCategory(t *testing.T) {
-	ap := NewAudioProcessor(Config{PackName: "TestPack"})
-
 	tests := []struct {
 		input    string
 		expected string
 	}{
-		{"SFX_Voice", "SFX_VOICE"}, // normalizeCategory uppercases
-		{"SFX_Creature", "SFX_CREATURE"},
-		{"SFX_Weapon", "SFX_WEAPON"},
-		{"SFX_Impact", "SFX_IMPACT"},
-		{"SFX_Footstep", "SFX_FOOTSTEP"},
-		{"SFX_Vehicle", "SFX_VEHICLE"},
-		{"SFX_Mechanical", "SFX_MECHANICAL"},
-		{"SFX_Object", "SFX_OBJECT"},
-		{"SFX_UI", "SFX_UI"},
-		{"SFX_Alarm", "SFX_ALARM"},
+		{"SFX_Voice", "SFX_Voice"}, // NormalizeCategory uses map lookup, preserves case
+		{"SFX_Creature", "SFX_Creature"},
+		{"SFX_Weapon", "SFX_Weapon"},
+		{"SFX_Impact", "SFX_Impact"},
+		{"SFX_Footstep", "SFX_Footstep"},
+		{"SFX_Vehicle", "SFX_Vehicle"},
+		{"SFX_Mechanical", "SFX_Mechanical"},
+		{"SFX_Object", "SFX_Object"},
+		{"SFX_UI", "SFX_UI"}, // SFX_UI not in map, already has "_", so returned as-is
+		{"UI", "UI"},         // UI maps to "UI" in CategoryNormalization
+		{"SFX_Alarm", "SFX_Alarm"},
 		{"Ambient", "Ambient"},
 		{"Music", "Music"},
 		{"SFX", "SFX"},
+		{"PE", "SFX_Percussion"}, // PE maps to SFX_Percussion
+		{"DRONE", "SFX_Drone"},
+		{"LOOP", "Music"},
 		{"unknown", "SFX_UNKNOWN"}, // unknown gets SFX_ prefix and uppercased
-		{"", "SFX_"}, // empty: "" -> "" -> not in map -> !contains("_") -> "SFX_" + "" = "SFX_"
+		{"", "SFX_"},               // empty: "" -> "" -> not in map -> !contains("_") -> "SFX_" + "" = "SFX_"
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			result := ap.normalizeCategory(tt.input)
+			result := NormalizeCategory(tt.input)
 			if result != tt.expected {
-				t.Errorf("normalizeCategory(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("NormalizeCategory(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
@@ -226,7 +230,7 @@ func TestParseFile(t *testing.T) {
 			originalName:   "Scream_SFXB.1471.wav",
 			expectedID:     "1471",
 			expectedSource: "SFXB",
-			expectedCat:    "SFX_VOICE", // normalizeCategory uppercases
+			expectedCat:    "SFX_Voice", // NormalizeCategory preserves case
 		},
 		{
 			name:           "dash_category",
@@ -298,4 +302,3 @@ func contains(slice []string, item string) bool {
 	}
 	return false
 }
-

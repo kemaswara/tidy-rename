@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-11-30
+
+### Added
+- **New SFX categories**: Added support for Drones, Loops, Risers, Slowmotion/Timelapses, Transitions, Whooshes, Traditional/Ceremonial sounds, and String instruments
+- **Enhanced category detection**: Expanded keyword matching for existing categories (Percussion, Nature/Ambient, City/Urban, Vehicles, Animals, Music)
+- **Centralized category system**: New `categories.go` file with structured category definitions for easy maintenance and extension
+
+### Changed
+- **Major refactoring**: Completely refactored category inference system from scattered if-else chains to a centralized, data-driven approach
+- **Improved maintainability**: Category rules are now defined in a single `CategoryRules` array, making it trivial to add new categories or modify existing ones
+- **Simplified codebase**: Removed 200+ lines of repetitive category matching code from `processor.go` and `audio_analyzer.go`
+- **Better extensibility**: New category system supports priorities, exclusions, and confidence scores in a structured way
+
 ## [1.0.3] - 2025-11-30
 
 ### Fixed
@@ -68,7 +81,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A (initial release)
 
-[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/kemaswara/tidy-rename/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/kemaswara/tidy-rename/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/kemaswara/tidy-rename/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/kemaswara/tidy-rename/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/kemaswara/tidy-rename/compare/v1.0.0...v1.0.1
